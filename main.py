@@ -1,5 +1,8 @@
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import pandas as pd
+
 
 finviz_url = 'https://finviz.com/quote.ashx?t='
 tickers = ['AMZN', 'AMD', 'FB']
@@ -16,17 +19,6 @@ for ticker in tickers:
     news_tables[ticker] = news_table
     break
 
-# amzn_data = news_tables['AMZN']
-# amzn_rows = amzn_data.findAll('tr')
-#
-# for index, row in enumerate(amzn_rows):
-#     if row.a is not None:
-#         title = row.a.text
-#         timestamp = row.td.text
-#         print(timestamp + " " + title)
-#     else:
-#         continue
-
 parsed_data = []
 
 for ticker, news_table in news_tables.items():
@@ -42,4 +34,11 @@ for ticker, news_table in news_tables.items():
         else:
             continue
         parsed_data.append([ticker, date, time, title])
-print(parsed_data)
+
+df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title'])
+vader = SentimentIntensityAnalyzer()
+
+f = lambda title: vader.polarity_scores(title)['compound'] # takes in any string (title in this fn) and just gives back the compound score
+df['compound'] = df['title'].apply(f) # creates new column in df
+
+print(df.head())
