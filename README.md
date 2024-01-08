@@ -1,0 +1,1 @@
+Simple Data Science script to analyze averagesentiment about a list of stocks for predictions. A BeautifulSoup web scraper pulls article titles from FinViz, cleans the data, parses by time and applies the Sentiment Analysis using Vader from NLTK.
